@@ -14,8 +14,8 @@ def decrypt_AES_GCM(ciphertext, nonce, authTag, secretKey):
   return plaintext
 
 def ecc_point_to_256_bit_key(point):
-  sha = hashlib.sha256(int.to_bytes(point.x, 32,'big'))
-  sha.update(int.to_bytes(point.y,32,'big'))
+  sha = hashlib.sha256(int.to_bytes(point.x, 32, 'big'))
+  sha.update(int.to_bytes(point.y, 32, 'big'))
   return sha.digest()
 
 curve = registry.get_curve('brainpoolP256r1')
@@ -26,7 +26,7 @@ def encrypt_ECC(msg, pubKey):
   secretKey = ecc_point_to_256_bit_key(sharedECCKey)
   ciphertext, nonce, authTag = encrypt_AES_GCM(msg, secretKey)
   ciphertextPubkey = ciphertextPrivKey * curve.g
-  return (ciphertext, nonce, authTag,ciphertextPubkey)
+  return (ciphertext, nonce, authTag, ciphertextPubkey)
 
 def decrypt_ECC(encryptedMsg, privKey):
   (ciphertext, nonce, authTag, ciphertextPubkey) = encryptedMsg
@@ -34,21 +34,30 @@ def decrypt_ECC(encryptedMsg, privKey):
   secretKey = ecc_point_to_256_bit_key(sharedECCKey)
   plaintext = decrypt_AES_GCM(ciphertext, nonce, authTag, secretKey)
 
-
-
 msg = b'HAN SEUNG CHUL'
-print("original msg : ", msg)
+print("original msg: ", msg)
+
+# 암호화 작업 전후의 시간 측정
+start_time = time.time()
 privKey = secrets.randbelow(curve.field.n)
 pubKey = privKey * curve.g
 
 encryptedMsg = encrypt_ECC(msg, pubKey)
 encryptedMsgObj = {
-    'ciphertext' : binascii.hexlify(encryptedMsg[0]),
+    'ciphertext': binascii.hexlify(encryptedMsg[0]),
     'nonce': binascii.hexlify(encryptedMsg[1]),
     'authTag': binascii.hexlify(encryptedMsg[2]),
     'ciphertextPubKey': hex(encryptedMsg[3].x) + hex(encryptedMsg[3].y % 2)[2:]
 }
+end_time = time.time()
+
+print("Total encryption time: {end_time - start_time} seconds")
 print("encrypted msg: ", encryptedMsgObj)
 
+# 복호화 작업 전후의 시간 측정
+start_time = time.time()
 decryptedMsg = decrypt_ECC(encryptedMsg, privKey)
+end_time = time.time()
+
+print(end_time - start_time)
 print("decrypted msg: ", decryptedMsg)
