@@ -29,3 +29,4 @@ for key in range (len(LETTERS)):
         else:
             translated = translated + symbol
     print('Hacking key #%s : %s' % (key, translated))
+    
