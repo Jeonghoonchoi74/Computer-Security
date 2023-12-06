@@ -1,6 +1,3 @@
-!pip install tinyec
-!pip install pycryptodome
-
 import hashlib
 from hashlib import sha512
 from Crypto.PublicKey import RSA
