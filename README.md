@@ -1,1 +1,1 @@
-# Computer-Security
+# Computer-Security from MJU class
